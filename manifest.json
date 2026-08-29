@@ -3,8 +3,12 @@
   "name": "PyScript Auto Ad Skipper",
   "version": "1.0",
   "description": "Scans the page for skip/close ad buttons using PyScript and clicks them automatically.",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Ad Skipper — Custom Filters"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

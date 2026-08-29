@@ -6,8 +6,19 @@ PyScript) instead of plain JavaScript for the detection logic.
 
 ## Files
 - `manifest.json` — extension config (Manifest V3)
-- `content.js` — injects the PyScript runtime + `skipper.py` into every page
+- `content.js` — injects the PyScript runtime + `skipper.py`, and syncs your custom filters into the page
 - `skipper.py` — the Python scan/click logic, run in-browser via PyScript
+- `popup.html` / `popup.js` — UI (click the toolbar icon) for adding/removing custom filters
+
+## Custom filters
+Click the extension icon to open the filter manager. Each filter has:
+- **CSS selector** — e.g. `.some-ad-overlay`, `#skip-button`, `[aria-label="Close"]`
+- **Domain** (optional) — restrict the rule to one site (e.g. `example.com`); leave blank to apply everywhere
+- **Action**:
+  - **Click** — clicks the matched element(s), same as hitting skip/close yourself
+  - **Remove** — deletes the element from the page entirely (useful for overlay boxes with no working close button)
+
+Filters are stored in `chrome.storage.sync` and re-read by the Python scan loop every second, so edits in the popup take effect on open tabs without a page reload. Custom filters run before the built-in ad-skip detection, and a "Remove" rule will clear *all* matching elements per cycle rather than stopping at the first one.
 
 ## Install (Chrome / Edge / Brave)
 1. Go to `chrome://extensions/`

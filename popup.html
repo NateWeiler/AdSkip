@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Ad Skipper Filters</title>
+  <style>
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 12px;
+      margin: 0;
+    }
+    h1 {
+      font-size: 14px;
+      margin: 0 0 8px;
+    }
+    .hint {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 12px;
+    }
+    label {
+      font-size: 11px;
+      color: #444;
+    }
+    input, select {
+      font-size: 12px;
+      padding: 5px 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .row select {
+      flex: 0 0 90px;
+    }
+    .row-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    button {
+      cursor: pointer;
+      font-size: 12px;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #f7f7f7;
+    }
+    button[type="submit"] {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      flex: 1;
+    }
+    #fill-domain {
+      flex: 0 0 auto;
+    }
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 11px;
+    }
+    li .meta {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    li code {
+      background: #f3f3f3;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    li button {
+      flex: none;
+      padding: 2px 7px;
+      color: #b91c1c;
+    }
+    .empty {
+      font-size: 11px;
+      color: #888;
+      padding: 8px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Custom Ad-Skipper Filters</h1>
+  <p class="hint">
+    Add a CSS selector for an element on this site. "Click" is for skip/close
+    buttons, "Remove" deletes the element entirely (good for stubborn overlays).
+  </p>
+
+  <form id="filter-form">
+    <label for="selector">CSS selector</label>
+    <input id="selector" type="text" placeholder=".some-ad-overlay, #skip-btn" required />
+
+    <label for="domain">Domain (optional — blank applies everywhere)</label>
+    <div class="row">
+      <input id="domain" type="text" placeholder="example.com" />
+      <button type="button" id="fill-domain">Use current site</button>
+    </div>
+
+    <label for="action">Action</label>
+    <div class="row">
+      <select id="action">
+        <option value="click">Click</option>
+        <option value="remove">Remove</option>
+      </select>
+      <button type="submit">Add filter</button>
+    </div>
+  </form>
+
+  <ul id="filter-list"></ul>
+  <div class="empty" id="empty-msg" style="display:none;">No custom filters yet.</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
