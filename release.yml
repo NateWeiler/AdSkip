@@ -1,0 +1,26 @@
+name: Package Extension
+
+# Runs whenever you push a tag like v1.0, v1.1, etc.
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Zip extension
+        run: |
+          zip -r ad-skipper-extension.zip . \
+            -x ".git/*" ".github/*" ".gitignore" "*.md"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ad-skipper-extension.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
