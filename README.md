@@ -7,11 +7,26 @@ PyScript) instead of plain JavaScript for the detection logic.
 ## Files
 - `manifest.json` — extension config (Manifest V3)
 - `content.js` — injects the PyScript runtime + `skipper.py`, and syncs your custom filters into the page
+- `picker.js` — the visual element picker (hover, right-click, confirm)
 - `skipper.py` — the Python scan/click logic, run in-browser via PyScript
-- `popup.html` / `popup.js` — UI (click the toolbar icon) for adding/removing custom filters
+- `popup.html` / `popup.js` — UI (click the toolbar icon) for adding/removing custom filters, or launching the picker
 
-## Custom filters
-Click the extension icon to open the filter manager. Each filter has:
+## Picking an element visually
+Instead of writing a CSS selector by hand, click the toolbar icon → **🎯 Pick element on page**. The popup closes and:
+
+1. **Hover** over the page — the element under your cursor gets a blue outline.
+2. **Right-click** the element you want → a menu appears with four choices:
+   - **🚫 Remove / hide this element** — deletes it from the page (for ad boxes, overlays)
+   - **👆 Click this (treat as skip/next)** — clicks it automatically (for skip/close buttons)
+   - **↺ Choose a different element** — closes the menu and lets you keep hovering/right-clicking if the wrong thing got highlighted
+   - **✕ Exit picker mode** — cancels without adding anything
+3. If you pick Remove or Click, a small confirm panel shows the auto-generated CSS selector (editable) and domain before saving — nothing is added to your filter list until you hit **Add filter**.
+4. Press **Esc** at any time to exit picker mode.
+
+While picking, ordinary left-clicks on the page are suppressed so you don't accidentally trigger the very ad/skip button you're trying to select — right-click is the only way to act on an element.
+
+## Custom filters (manual entry)
+You can also add filters directly from the popup form without the picker. Each filter has:
 - **CSS selector** — e.g. `.some-ad-overlay`, `#skip-button`, `[aria-label="Close"]`
 - **Domain** (optional) — restrict the rule to one site (e.g. `example.com`); leave blank to apply everywhere
 - **Action**:

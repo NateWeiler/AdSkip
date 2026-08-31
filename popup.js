@@ -78,3 +78,16 @@ form.addEventListener('submit', async (e) => {
 });
 
 getFilters().then(render);
+
+// --- Element picker trigger ---
+document.getElementById('start-picker').addEventListener('click', async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab || !tab.id) return;
+  try {
+    await chrome.tabs.sendMessage(tab.id, { type: 'START_PICKER' });
+  } catch (e) {
+    // Content script may not be injected on special pages (chrome://, store, etc.)
+    console.error('Could not start picker on this tab:', e);
+  }
+  window.close(); // get the popup out of the way so the page is interactive
+});
