@@ -136,22 +136,24 @@
     ctxMenu.style.left = Math.min(x, window.innerWidth - 250) + 'px';
     ctxMenu.style.top = Math.min(y, window.innerHeight - 180) + 'px';
     ctxMenu.innerHTML = `
-      <button data-action="remove">🚫 Remove / hide this element</button>
-      <button data-action="click">👆 Click this (treat as skip/next)</button>
+      <button data-action="skip">👆 This is a Skip button</button>
+      <button data-action="exit">🚫 This is an Exit / Close box</button>
       <button data-action="reselect">↺ Choose a different element</button>
-      <button data-action="exit">✕ Exit picker mode</button>
+      <button data-action="cancel">✕ Exit picker mode</button>
     `;
     document.body.appendChild(ctxMenu);
 
     ctxMenu.querySelectorAll('button').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const action = btn.dataset.action;
+        const chosen = btn.dataset.action;
         closeContextMenu();
-        if (action === 'remove' || action === 'click') {
-          showConfirmPanel(el, action, x, y);
-        } else if (action === 'reselect') {
+        if (chosen === 'skip') {
+          showConfirmPanel(el, 'click', 'skip', x, y);
+        } else if (chosen === 'exit') {
+          showConfirmPanel(el, 'remove', 'exit', x, y);
+        } else if (chosen === 'reselect') {
           // stay in picking mode, just keep hovering
-        } else if (action === 'exit') {
+        } else if (chosen === 'cancel') {
           stopPicker();
         }
       });
@@ -167,18 +169,19 @@
 
   // ---------- confirm panel ----------
   let confirmPanel;
-  function showConfirmPanel(el, action, x, y) {
+  function showConfirmPanel(el, action, type, x, y) {
     closeConfirmPanel();
     ensureStyles();
     const selector = getUniqueSelector(el);
     const domain = location.hostname;
+    const typeLabel = type === 'skip' ? 'Skip button' : 'Exit / Close box';
 
     confirmPanel = document.createElement('div');
     confirmPanel.id = UI_ID_PREFIX + 'confirm-panel';
     confirmPanel.style.left = Math.min(x, window.innerWidth - 260) + 'px';
     confirmPanel.style.top = Math.min(y, window.innerHeight - 220) + 'px';
     confirmPanel.innerHTML = `
-      <div style="font-weight:600;">Add filter — ${action === 'remove' ? 'Remove/Hide' : 'Click'}</div>
+      <div style="font-weight:600;">Add filter — ${typeLabel}</div>
       <label>CSS selector</label>
       <input id="${UI_ID_PREFIX}sel-input" value="${selector.replace(/"/g, '&quot;')}" />
       <label>Domain (blank = all sites)</label>
@@ -197,9 +200,9 @@
       const sel = document.getElementById(UI_ID_PREFIX + 'sel-input').value.trim();
       const dom = document.getElementById(UI_ID_PREFIX + 'domain-input').value.trim();
       if (!sel) return;
-      await saveFilter(sel, dom, action);
+      await saveFilter(sel, dom, action, type);
       closeConfirmPanel();
-      showToast('Filter added ✓');
+      showToast(`${typeLabel} filter added ✓`);
       stopPicker();
     });
   }
@@ -212,9 +215,9 @@
   }
 
   // ---------- storage ----------
-  async function saveFilter(selector, domain, action) {
+  async function saveFilter(selector, domain, action, type) {
     const { customFilters = [] } = await chrome.storage.sync.get('customFilters');
-    customFilters.push({ selector, domain, action, enabled: true });
+    customFilters.push({ selector, domain, action, type: type || 'custom', enabled: true });
     await chrome.storage.sync.set({ customFilters });
   }
 

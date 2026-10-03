@@ -17,6 +17,10 @@ async function saveFilters(filters) {
   await chrome.storage.sync.set({ customFilters: filters });
 }
 
+function actionLabel(f) {
+  return f.action === 'remove' ? 'Exit/Close box' : 'Skip button';
+}
+
 function render(filters) {
   list.innerHTML = '';
   emptyMsg.style.display = filters.length === 0 ? 'block' : 'none';
@@ -26,7 +30,7 @@ function render(filters) {
 
     const meta = document.createElement('span');
     meta.className = 'meta';
-    meta.innerHTML = `<b>${f.domain || '*'}</b> — <code>${escapeHtml(f.selector)}</code> → ${f.action}`;
+    meta.innerHTML = `<b>${f.domain || '*'}</b> — <code>${escapeHtml(f.selector)}</code> → ${actionLabel(f)}`;
 
     const del = document.createElement('button');
     del.textContent = '✕';
@@ -70,6 +74,7 @@ form.addEventListener('submit', async (e) => {
     selector,
     domain: domainInput.value.trim(),
     action: actionSelect.value,
+    type: actionSelect.value === 'remove' ? 'exit' : 'skip',
     enabled: true,
   });
   await saveFilters(filters);
@@ -90,4 +95,39 @@ document.getElementById('start-picker').addEventListener('click', async () => {
     console.error('Could not start picker on this tab:', e);
   }
   window.close(); // get the popup out of the way so the page is interactive
+});
+
+// --- Export filters for sharing back to Claude ---
+const exportBtn = document.getElementById('export-filters');
+const exportOutput = document.getElementById('export-output');
+const copyBtn = document.getElementById('copy-export');
+
+exportBtn.addEventListener('click', async () => {
+  const filters = await getFilters();
+  if (filters.length === 0) {
+    exportOutput.value = '(no filters saved yet)';
+  } else {
+    const lines = filters.map((f) => {
+      const domain = f.domain || '*';
+      const label = actionLabel(f);
+      return `${domain} | ${label} | ${f.selector}`;
+    });
+    exportOutput.value =
+      'domain | type | selector\n' + '---\n' + lines.join('\n');
+  }
+  exportOutput.style.display = 'block';
+  copyBtn.style.display = 'block';
+});
+
+copyBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(exportOutput.value);
+    copyBtn.textContent = 'Copied ✓';
+  } catch (e) {
+    // fallback for environments without clipboard permission
+    exportOutput.select();
+    document.execCommand('copy');
+    copyBtn.textContent = 'Copied ✓';
+  }
+  setTimeout(() => (copyBtn.textContent = 'Copy to clipboard'), 1500);
 });

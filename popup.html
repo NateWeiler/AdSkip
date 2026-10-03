@@ -127,11 +127,11 @@
       <button type="button" id="fill-domain">Use current site</button>
     </div>
 
-    <label for="action">Action</label>
+    <label for="action">What is this element?</label>
     <div class="row">
       <select id="action">
-        <option value="click">Click</option>
-        <option value="remove">Remove</option>
+        <option value="click">Skip button (click it)</option>
+        <option value="remove">Exit / Close box (remove it)</option>
       </select>
       <button type="submit">Add filter</button>
     </div>
@@ -139,6 +139,11 @@
 
   <ul id="filter-list"></ul>
   <div class="empty" id="empty-msg" style="display:none;">No custom filters yet.</div>
+
+  <button id="export-filters" style="width:100%; margin-top:10px;">📋 Export filters</button>
+  <textarea id="export-output" readonly rows="6"
+    style="width:100%; box-sizing:border-box; margin-top:6px; display:none; font-family:monospace; font-size:11px;"></textarea>
+  <button id="copy-export" style="width:100%; margin-top:4px; display:none;">Copy to clipboard</button>
 
   <script src="popup.js"></script>
 </body>
